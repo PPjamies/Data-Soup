@@ -1,12 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import {
-  StyleSheet,
-  Dimensions,
-  View,
-  Text,
-  TouchableOpacity,
-  SafeAreaView
-} from "react-native";
+import {StyleSheet, Dimensions, View, Text, TouchableOpacity, SafeAreaView } from "react-native";
 import { Camera } from "expo-camera";
 import { Video } from "expo-av";
 import * as MediaLibrary from 'expo-media-library';
@@ -17,7 +10,7 @@ const WINDOW_HEIGHT = Dimensions.get("window").height;
 const closeButtonSize = Math.floor(WINDOW_HEIGHT * 0.032);
 const captureSize = Math.floor(WINDOW_HEIGHT * 0.09);
 
-export default function App() {
+export default function camera_video() {
     //state hooks
     const [hasPermission, setHasPermission] = useState(null);
     const [hasPermissionToMediaLib, setHasPermissionToMediaLib] = useState(null);
@@ -65,21 +58,17 @@ export default function App() {
   };
 
   //Take picture
-  const takePicture = async() =>{
-
+  const takePicture = async() => {
     if(cameraRef.current){
-
         //to use expo-camera takePictureAsync() method requires options object which contain the picture configs
         const options ={
             quality : 1.0,
             base64: true
         };
-        
         //promise returns object { uri, width, height, exif, base64 } 
         //where uri is a URI to the local image file on iOS and Android
         const data = await cameraRef.current.takePictureAsync(options);
         const source = data.uri;
-
         if(source){
             await cameraRef.current.pausePreview();
             setIsPreview(true);
@@ -92,21 +81,16 @@ export default function App() {
   //Record video
   const recordVideo = async() =>{
     if(cameraRef.current){
-
         const options = {
             quality: Camera.Constants.VideoQuality['1080p'],
             mute: true
         };
-
         try{
             const videoRecordPromise = cameraRef.current.recordAsync(options);
-
             if(videoRecordPromise){
-
               setIsVideoRecording(true);
               const data = await videoRecordPromise;
               const source = data.uri;
-
               if(source){
                   setIsPreview(true);
                   console.log("Video source: ", source);
@@ -121,7 +105,7 @@ export default function App() {
   };
 
   //Stop video recording
-  const stopVideoRecording = () =>{
+  const stopVideoRecording = () => {
     if(cameraRef.current){
       setIsPreview(false);
       setIsVideoRecording(false);

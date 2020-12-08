@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, View, Button} from 'react-native';
 import { globalStyles } from '../styles/global';
 
-//instead of passing in all of props to Home function
+//Instead of passing in all of props to Home function
 //destructure what we need from props - navigation
 export default function Home({navigation}){  
   //when we configured navigation stack
@@ -14,7 +14,6 @@ export default function Home({navigation}){
       navigation.navigate('Gallery');
     else if(option == 'camera') 
       navigation.navigate('Camera');
-    
   }
 
     return (
