@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Image, Button, StyleSheet } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
-import { globalStyles } from "../styles/global";
+import { globalStyles } from "../../styles/global";
 
 export default function DocumentPickerTest() {
   const [imageURI, setimageURI] = useState(
