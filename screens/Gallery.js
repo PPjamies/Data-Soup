@@ -1,10 +1,7 @@
-import React, { useState } from 'react';
-import { Text, View} from 'react-native';
+import React, { useState } from "react";
+import { Text, View } from "react-native";
+import FileSelector from "../screens/FileSelector";
 
-export default function Gallery(){  
-    return (
-      <View>
-          <Text>Gallery Screen</Text>
-      </View>
-    );
-  }
+export default function Gallery() {
+  return <FileSelector />;
+}

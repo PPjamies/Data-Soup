@@ -4,13 +4,13 @@ import React from "react";
 import Navigator from "./routes/HomeStack";
 import CameraVideo from "./screens/experimenting/CameraVideo";
 import DocumentPickerTest from "./screens/experimenting/DocumentPickerTest";
-import ImagePickerTest from "./screens/experimenting/ImagePickerTest";
+import ImagePicker from "./screens/FileSelector";
 
 export default function App() {
   return (
-    //<Navigator/>
+    <Navigator />
     //  <CameraVideo/>
     // <DocumentPickerTest/>
-    <ImagePickerTest />
+    // <ImagePicker />
   );
 }
