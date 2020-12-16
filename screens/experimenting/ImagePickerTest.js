@@ -1,20 +1,27 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, Button, Image, View } from "react-native";
+import { Text, StyleSheet, Button, Image, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { globalStyles } from "../../styles/global";
 import { FlatList } from "react-native-gesture-handler";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function ImagePickerTest() {
+  const numColumns = 2;
   const [images, setImages] = useState([]);
-  const [storedImages, setStoredImages] = useState([]);
+  const [viewWidth, setViewWidth] = useState(0);
+
+  useEffect(() => {
+    console.log("Images array: " + images);
+    saveImagesToAsync();
+  });
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
       allowsMultipleSelection: true,
     });
-    setImages([...images, result]);
-    saveImagesToAsync();
+    console.log(result);
+    await setImages((images) => [...images, result]);
   };
 
   const saveImagesToAsync = async () => {
@@ -26,26 +33,22 @@ export default function ImagePickerTest() {
     }
   };
 
-  const getData = async () => {
-    try {
-      const jsonValue = await AsyncStorage.getItem("images");
-      setStoredImages(jsonValue != null ? JSON.parse(jsonValue) : null);
-    } catch (e) {
-      console.log("Error retrieving data: " + e);
-    }
-  };
-
   return (
-    <View style={globalStyles.container}>
-      <Button title="Pick image" onPress={pickImage} />
-      <Button title="Display images" onPress={getData} />
+    <View
+      style={globalStyles.container}
+      onLayout={(event) => {
+        setViewWidth(event.nativeEvent.layout.width);
+      }}
+    >
+      <Button title="Pick an image or video" onPress={pickImage} />
       <FlatList
-        data={storedImages}
+        data={images}
+        numColumns={numColumns}
         keyExtractor={(item, index) => item.uri}
         renderItem={({ item }) => (
           <Image
             source={{ uri: item.uri }}
-            style={{ width: 200, height: 200 }}
+            style={{ width: viewWidth / 2, height: viewWidth / 2 }}
           />
         )}
       />
