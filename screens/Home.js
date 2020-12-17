@@ -19,10 +19,6 @@ export default function Home({ navigation }) {
       <Text styles={globalStyles.titleText}>Home Screen</Text>
       <Button title="Gallery" onPress={() => pressHandler("gallery")} />
       <Button title="Camera" onPress={() => pressHandler("camera")} />
-      <Button
-        title="Select an image or video"
-        onPress={() => pressHandler("fileSelector")}
-      />
     </View>
   );
 }

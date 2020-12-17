@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, StyleSheet, Button, Image, View } from "react-native";
+import { Button, Image, View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { globalStyles } from "../styles/global";
 import { FlatList } from "react-native-gesture-handler";

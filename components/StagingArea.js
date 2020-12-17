@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, FlatList, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import UriItem from './UriItem';
 
-export default function WTF(){
+export default function StagingArea(){
     const [label, setLabel] = useState('Enter a label');
     const [listOfUris, setListOfUris] = useState([]);
     const [isUploading, setIsUploading] = useState(false);

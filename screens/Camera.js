@@ -1,11 +1,8 @@
-import React, { useState } from 'react';
-import { Text, View} from 'react-native';
+import React from 'react';
+import CameraVideo from '../components/CameraVideo';
 
 export default function Camera(){  
-  
     return (
-      <View>
-          <Text>Camera Screen</Text>
-      </View>
+      <CameraVideo/>
     );
   }
