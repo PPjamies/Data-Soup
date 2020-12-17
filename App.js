@@ -1,5 +1,5 @@
 import React from "react";
-import Navigator from "./routes/HomeStack";
+import Navigator from "./routes/RouteStack";
 
 export default function App() {
   return (

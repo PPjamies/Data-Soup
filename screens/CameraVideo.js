@@ -4,20 +4,21 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Camera } from "expo-camera";
 import { Video } from "expo-av";
 import * as MediaLibrary from 'expo-media-library';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 //constant dimensions
 const WINDOW_HEIGHT = Dimensions.get("window").height;
 const captureSize = Math.floor(WINDOW_HEIGHT * 0.09);
 
-export default function Camera_Video() {
+export default function CameraVideo({navigation}) {
     const [hasCameraPermission, setHasCameraPermission] = useState(null);
     const [hasLibraryPermission, setHasLibraryPermission] = useState(null);
     const [cameraType, setCameraType] = useState(Camera.Constants.Type.back);
     const [isCameraReady, setIsCameraReady] = useState(false);
     const [isVideoRecording, setIsVideoRecording] = useState(false);
-    const [isPicturePreview, setIsPicturePreview] = useState(false);
-    const [isVideoPlayback, setIsVideoPlayback] = useState(false);
-    const [uri, setUri] = useState(null);
+    const [isPreview, setIsPreview] = useState(false);
+    const [pictureUri, setPictureUri] = useState(null);
+    const [videoUri, setVideoUri] = useState(null);
     const cameraRef = useRef();
 
 /******************** EVENT HANDLERS ******************************************************************************/
@@ -25,18 +26,27 @@ export default function Camera_Video() {
     //check permission to use camera
     //check permission to access library
     useEffect(() => {
-
         (async () => {
           const { cameraPermissionStatus } = await Camera.requestPermissionsAsync();
           setHasCameraPermission(cameraPermissionStatus === 'granted');
         })();
-
         (async () => {
             const { libraryPermissionStatus } = await MediaLibrary.requestPermissionsAsync();
             setHasLibraryPermission(libraryPermissionStatus === 'granted');
         })();
 
-    }, []);
+        console.log("Initial State - isVideoRecording: " , isVideoRecording, " isPreview: ", 
+         isPreview, " pictureUri: " , pictureUri, " videoUri: " , videoUri);
+    },[]);
+
+    //re-render whenever certain useStates change
+    useEffect(() => {
+        console.log("A state has changed - isVideoRecording: " , isVideoRecording, " isPreview: ", 
+         isPreview, " pictureUri: " , pictureUri, " videoUri: " , videoUri);
+    },[isVideoRecording, isPreview, pictureUri, videoUri]);
+
+    // console.log("A state has changed: " , isVideoRecording, isPreview, isVideoPlayback, uri);
+    // isVideoRecording, isPreview, isVideoPlayback, uri
 
     //check camera is ready
     const onCameraReady = () => {
@@ -66,8 +76,7 @@ export default function Camera_Video() {
             const source = data.uri;
             if(source){
                 await cameraRef.current.pausePreview();
-                setIsPicturePreview(true);
-                setUri(source);
+                setPictureUri(source);
             }
         }
     };
@@ -86,7 +95,7 @@ export default function Camera_Video() {
                   const data = await videoRecordPromise;
                   const source = data.uri;
                   if(source){
-                      setUri(source);
+                      setVideoUri(source);
                   }
                 }
             }catch(error){
@@ -97,24 +106,46 @@ export default function Camera_Video() {
 
     //save content
     const saveToLibrary = async() => {
-        await MediaLibrary.createAssetAsync(uri);
+        let uri = videoUri ? videoUri : pictureUri;
+        try {
+            const asset = await MediaLibrary.createAssetAsync(uri);
+            //save image to async storage (cache)
+            saveImagesToAsync();
+            launchStagingArea();
+        } catch(error){
+            console.log("create asset async: ", error);
+        }
+
     };
 
-    //stop video recording
-    const stopVideoRecording = () => {
-        if(cameraRef.current){
-            setIsVideoRecording(false);
-            setIsVideoPlayback(true);
-            cameraRef.current.stopRecording();
+    const saveImagesToAsync = async () => {
+        try {
+          await AsyncStorage.setItem("images", JSON.stringify(images));
+          console.log(JSON.stringify(images));
+        } catch (error) {
+          console.log("Error storing images in asyncStorage: " + error);
         }
-    }
+      };
+
+    const launchStagingArea = async() => {
+        console.log("Done button is hit");
+        navigation.navigate("Upload");
+      };
+
+    const stopPress = () => {
+        if(cameraRef.current){
+            cameraRef.current.stopRecording();
+            setIsVideoRecording(false);
+            setIsPreview(true);
+        }
+    };
 
     const cancelPreview = async() =>{
         await cameraRef.current.resumePreview();
-        setIsPicturePreview(false);
-        setIsVideoPlayback(false);
-        setUri(null);
-      }
+        setIsPreview(false);
+        setPictureUri(null);
+        setVideoUri(null);
+    };
 
 /******************** EVENT RENDERS ******************************************************************************/
     const renderPicturePreview = () => (
@@ -139,12 +170,12 @@ export default function Camera_Video() {
                 </TouchableOpacity>
             </View>
             <Video
-                source={{ uri: uri }}
+                source={{ uri: videoUri }}
                 shouldPlay={true}
                 isLooping
                 isMuted={true}
                 style={styles.media}
-            />
+            /> 
         </View>
 
     );
@@ -162,19 +193,19 @@ export default function Camera_Video() {
                 <Text style={styles.text}>{"Flip"}</Text>
             </TouchableOpacity>
             <TouchableOpacity
-            activeOpacity={0.7}
-            disabled={!isCameraReady}
-            onLongPress={recordVideo}
-            onPressOut={stopVideoRecording}
-            onPress={takePicture}
-            style={styles.capture}
+                activeOpacity={0.7}
+                disabled={!isCameraReady}
+                onLongPress={recordVideo}
+                onPressOut={stopPress}
+                onPress={takePicture}
+                style={styles.capture}
             />
         </View>
     );
 
 
     return(
-        <SafeAreaView style={styles.container}>
+        <View style={styles.container}>
         <Camera
           ref={cameraRef}
           type={cameraType}
@@ -186,12 +217,12 @@ export default function Camera_Video() {
           }}
         />
         <View style={styles.container}>
-            { !isPicturePreview && !uri && renderCaptureControl() }
-            { isPicturePreview && renderPicturePreview() } 
+            { !isPreview && !pictureUri && !videoUri && renderCaptureControl() }
+            { isPreview && !videoUri && pictureUri && renderPicturePreview() } 
             { isVideoRecording && renderVideoRecording() }
-            { isVideoPlayback && renderVideoPlayback() }
+            { isPreview && !pictureUri && videoUri && renderVideoPlayback() }
         </View>
-      </SafeAreaView>
+      </View>
     );
 }
 /******************** STYLES **************************************************************************************/   
@@ -209,7 +240,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         marginLeft: 20,
         marginRight: 20,
-        marginTop: '17%',
+        marginTop: 20
     },
     mediaContainer:{
         backgroundColor: '#333',

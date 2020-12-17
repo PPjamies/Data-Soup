@@ -1,10 +1,10 @@
 import React from "react";
-import { Text, View, Button } from "react-native";
+import { View, Button } from "react-native";
 import { globalStyles } from "../styles/global";
 
 //Instead of passing in all of props to Home function
 //destructure what we need from props - navigation
-export default function Home({ navigation }) {
+export default function Home({navigation}) {
   //when we configured navigation stack
   //every screen gets a navigation property
   //props.navigation
@@ -16,7 +16,6 @@ export default function Home({ navigation }) {
 
   return (
     <View styles={globalStyles.container}>
-      <Text styles={globalStyles.titleText}>Home Screen</Text>
       <Button title="Gallery" onPress={() => pressHandler("gallery")} />
       <Button title="Camera" onPress={() => pressHandler("camera")} />
     </View>

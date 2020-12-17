@@ -2,7 +2,8 @@ import { createStackNavigator } from "react-navigation-stack";
 import { createAppContainer } from "react-navigation";
 import Home from "../screens/Home";
 import Gallery from "../screens/Gallery";
-import Camera from "../screens/Camera";
+import Camera from "../screens/CameraVideo";
+import Upload  from "../screens/Upload";
 
 //key-value pairs
 //Object-screen component
@@ -16,6 +17,9 @@ const screens = {
   Camera: {
     screen: Camera,
   },
+  Upload: {
+    screen: Upload,
+  }
 };
 
 //create a new stack navigator for the given screens
